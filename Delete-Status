@@ -1,0 +1,17 @@
+#!/bin/bash
+# MultiThread Delete POST facebook 
+# Get From Year?
+# year = curl -s "https://graph.facebook.com/me/posts?fields=id,status_type&limit=100000&access_token=$Token" | jq .data[].created_time | tr -d '\"' | gawk -F\- '{ print $1 }'
+delete(){
+	curl=`curl -s "https://graph.facebook.com/${1}?access_token=$Token&method=delete"`
+	if [[ $curl =~ "true" ]]; then
+		printf "[ DELETE STATUS = OK ]\n"
+	else
+		printf "[ DELETE STATUS = FAILED ]\n"
+	fi
+}
+read -p 'token' Token
+for id in $(curl -s "https://graph.facebook.com/me/posts?fields=id,status_type&limit=100000&access_token=$Token" | jq .data[].id | tr -d '\"'); do 
+	delete $id &
+done
+wait
